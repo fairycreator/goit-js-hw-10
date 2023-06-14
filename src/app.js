@@ -1,53 +1,72 @@
-import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
+import { fetchBreeds, fetchCatByBreed } from './cat-api';
+import SlimSelect from 'slim-select';
+import Notiflix from 'notiflix';
 
-const breedSelect = document.getElementById('breed-select');
-const catInfo = document.getElementById('cat-info');
-const catImage = document.querySelector('.cat-image');
-const catName = document.querySelector('.cat-name');
-const catDescription = document.querySelector('.cat-description');
-const catTemperament = document.querySelector('.cat-temperament');
-const breedLoader = document.querySelector('.breed-loader');
-const errorMessage = document.getElementById('error-message');
+const breedSelect = document.querySelector('.breed-select');
+const divImageEl = document.querySelector('.cat-image');
+const divDescEl = document.querySelector('.cat-details');
+const loaderEl = document.querySelector('.loader');
+const errorEl = document.querySelector('.error');
 
-let selectedBreedId = '';
+breedSelect.addEventListener('change', onChangeSelect);
 
-function populateBreeds() {
-  breedLoader.style.display = 'block';
-
+const fetchAndRenderBreeds = () => {
+  loaderEl.classList.remove('is-hidden');
+  errorEl.classList.add('is-hidden');
+  
   fetchBreeds()
-    .then(breeds => {
-      breeds.forEach(breed => {
-        const option = document.createElement('option');
-        option.value = breed.id;
-        option.textContent = breed.name;
-        breedSelect.appendChild(option);
-      });
-
-      breedLoader.style.display = 'none';
-      breedSelect.disabled = false;
+    .then(breeds => renderBreedsSelect(breeds))
+    .catch(error => {
+      showError();
+      console.error(error);
     })
-    .catch(error => console.error(error));
-}
+    .finally(() => {
+      loaderEl.classList.add('is-hidden');
+      breedSelect.classList.remove('is-hidden');
+    });
+};
 
-function fetchAndDisplayCatInfo(breedId) {
-  catInfo.style.display = 'none';
-  errorMessage.style.display = 'none';
+fetchAndRenderBreeds();
+
+function onChangeSelect(e) {
+  loaderEl.classList.remove('is-hidden');
+  errorEl.classList.add('is-hidden');
+  const breedId = e.target.value;
 
   fetchCatByBreed(breedId)
-    .then(cats => {
-      const cat = cats[0];
-      catImage.style.backgroundImage = `url(${cat.url})`;
-      catName.textContent = cat.breeds[0].name;
-      catDescription.textContent = cat.breeds[0].description;
-      catTemperament.textContent = `Temperament: ${cat.breeds[0].temperament}`;
-      catInfo.style.display = 'block';
+    .then(cat => renderCatInfo(cat))
+    .catch(error => {
+      showError();
+      console.error(error);
     })
-    .catch(error => console.error(error));
+    .finally(() => {
+      loaderEl.classList.add('is-hidden');
+      divImageEl.classList.remove('is-hidden');
+      divDescEl.classList.remove('is-hidden');
+    });
 }
 
-breedSelect.addEventListener('change', event => {
-  selectedBreedId = event.target.value;
-  fetchAndDisplayCatInfo(selectedBreedId);
-});
+function renderBreedsSelect(breeds) {
+  breeds.forEach(breed => {
+    const optionEl = document.createElement('option');
+    optionEl.value = breed.id;
+    optionEl.textContent = breed.name;
+    breedSelect.appendChild(optionEl);
+  });
 
-populateBreeds();
+  // Initialize SlimSelect on the breed select element
+  new SlimSelect({
+    select: breedSelect
+  });
+}
+
+function renderCatInfo(cat) {
+  divImageEl.innerHTML = `<img src="${cat.url}" alt="Cat Image">`;
+  divDescEl.querySelector('.cat-desc-title').textContent = cat.breeds[0].name;
+  divDescEl.querySelector('.cat-desc-desc').textContent = cat.breeds[0].description;
+  divDescEl.querySelector('.cat-desc-temperament').textContent = `Temperament: ${cat.breeds[0].temperament}`;
+}
+
+function showError() {
+  errorEl.classList.remove('is-hidden');
+}
