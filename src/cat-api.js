@@ -1,5 +1,4 @@
-const API_KEY = 'live_YOPeE8oR6yXBBidl9ezfqjVBhfvLe9dFm3bgtlkia9HHKqXbHwK15OYGkM2FvZjn'; 
-
+const API_KEY = 'live_YOPeE8oR6yXBBidl9ezfqjVBhfvLe9dFm3bgtlkia9HHKqXbHwK15OYGkM2FvZjn';
 
 export function fetchBreeds() {
   return fetch('https://api.thecatapi.com/v1/breeds', {
@@ -12,11 +11,6 @@ export function fetchBreeds() {
         throw new Error('Failed to fetch breeds.');
       }
       return response.json();
-    })
-    .then(data => data)
-    .catch(error => {
-      console.error(error);
-      throw error;
     });
 }
 
@@ -34,9 +28,5 @@ export function fetchCatByBreed(breedId) {
       }
       return response.json();
     })
-    .then(data => data[0])
-    .catch(error => {
-      console.error(error);
-      throw error;
-    });
+    .then(data => data[0]);
 }
