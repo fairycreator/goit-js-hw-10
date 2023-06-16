@@ -3,7 +3,7 @@ import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
 import SlimSelect from 'slim-select';
 import 'slim-select/dist/slimselect.css';
 
-const breedSelect = document.querySelector(`.breed-select`);
+const breedSelect = document.querySelector(`#breedSelect`);
 const divImageEl = document.querySelector(`.cat-image`);
 const divDescEl = document.querySelector(`.cat-desc`);
 const loaderEl = document.querySelector(`.loader`);
@@ -46,26 +46,28 @@ function onChangeSelect(e) {
 }
 
 const renderBreedsSelect = breeds => {
-
   console.log('Rendering breed description...');
 
   const markup = breeds
     .map(breed => {
-      return `<option value ="${breed.reference_image_id}">${breed.name}</option>`;
+      return `<option value="${breed.id}">${breed.name}</option>`;
     })
     .join('');
-  breedSelect.insertAdjacentHTML(`beforeend`, markup);
+  breedSelect.innerHTML = markup;
 
   new SlimSelect({
-    select: '#single',
+    select: '#breedSelect',
   });
 };
 
+
 const renderBreedDesc = breed => {
-  const markupImg = `<img class="cat-picture" src = "${breed.url}" alt = ${breed.id}>`;
-  const markupDesc = `<h2 class = "cat-info-desc-title">${breed.breeds[0].name}</h2>
-  <p class = "cat-info-desc-desc">${breed.breeds[0].description}</p>
-  <p class = "cat-info-desc-temperament"><b>Temperament:</b> ${breed.breeds[0].temperament}</p>`;
-  divImageEl.insertAdjacentHTML(`beforeend`, markupImg);
-  divDescEl.insertAdjacentHTML(`beforeend`, markupDesc);
+  const markupImg = `<img class="cat-picture" src="${breed[0].url}" alt="${breed[0].id}">`;
+  const markupDesc = `
+    <h2 class="cat-info-desc-title">${breed[0].breeds[0].name}</h2>
+    <p class="cat-info-desc-desc">${breed[0].breeds[0].description}</p>
+    <p class="cat-info-desc-temperament"><b>Temperament:</b> ${breed[0].breeds[0].temperament}</p>
+  `;
+  divImageEl.innerHTML = markupImg;
+  divDescEl.innerHTML = markupDesc;
 };

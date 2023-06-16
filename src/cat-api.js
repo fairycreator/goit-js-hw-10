@@ -4,8 +4,11 @@ const uniqueKey = 'live_FxaIVKAMfRXqyk9ztFjPD04tU5KpKnI33GgpcHylTuk5cBOmIRU1sGQP
 const fetchBreeds = () => {
   console.log('Fetching breeds from the API...');
 
-  return fetch(`${BASIC_URL}?api_key=${uniqueKey}`)
-    .then(response => {
+    const params = new URLSearchParams({
+    api_key: uniqueKey,
+  });
+  return fetch(`${BASIC_URL}?${params}`).then(response => {
+    console.log(response);
       if (!response.ok) {
         throw new Error(response.status);
       }
@@ -22,6 +25,10 @@ const fetchCatByBreed = breedId => {
         throw new Error(response.status);
       }
       return response.json();
+    })
+    .then(data => {
+      console.log(data); // Add this line to log the response data
+      return data;
     });
 };
 
